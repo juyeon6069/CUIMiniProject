@@ -61,14 +61,10 @@ public class ManageList {
             // 연결 실패 시 오류 메시지 출력
             System.out.println("[에러] 데이터베이스 연결 실패: " + e.getMessage());
         } finally {
-            if (conn != null) {
-                try {conn.close();
-                    System.out.println("데이터베이스 연결 해제");
-                } catch (SQLException e) {
-                    System.out.println("[에러] 연결 해제 실패: " + e.getMessage());
-                }
-            }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) {} }
+            if (conn != null) { try { conn.close(); } catch (SQLException e) {} }
         }
+
         whileLoop:
         while(true) {
             // 기본 페이지
