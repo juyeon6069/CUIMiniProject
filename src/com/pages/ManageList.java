@@ -4,21 +4,23 @@ import java.util.Scanner;
 
 public class ManageList {
     public static void main(String[] args) {
-        // 기본 페이지
-        System.out.println("회원 관리 프로그램");
-        System.out.println("=========================================");
-        System.out.println("1. 회원정보목록");
-        System.out.println("2. 회원정보등록");
-        System.out.println("3. 회원정보수정");
-        System.out.println("4. 회원정보삭제");
-        System.out.println();
-        System.out.println("5. 쪽지 보내기");
-        System.out.println("6. 종료");
-        System.out.println("=========================================");
-        System.out.print("메뉴를 입력하세요 : ");
-
         Scanner sc = new Scanner(System.in);
-        String option = sc.next();
+
+        whileLoop:
+        while(true) {
+            // 기본 페이지
+            System.out.println("회원 관리 프로그램");
+            System.out.println("=========================================");
+            System.out.println("1. 회원정보목록");
+            System.out.println("2. 회원정보등록");
+            System.out.println("3. 회원정보수정");
+            System.out.println("4. 회원정보삭제");
+            System.out.println();
+            System.out.println("5. 쪽지 보내기");
+            System.out.println("6. 종료");
+            System.out.println("=========================================");
+            System.out.print("메뉴를 입력하세요 : ");
+            String option = sc.next();
 
             switch (option) {
                 case "1":
@@ -38,10 +40,12 @@ public class ManageList {
                     break;
                 case "6":
                     System.out.println("프로그램을 종료합니다.");
+                    break whileLoop;
                 default:
-                    System.out.println("[에러]: 정확한 옵션을 선택해주세요");
+                    System.out.println("[에러]: 잘못된 값이 입력되었습니다");
                     break;
             }
+        }
     }
 
     public static void list(){
