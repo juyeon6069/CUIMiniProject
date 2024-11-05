@@ -1,11 +1,7 @@
 package com.pages;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
 import java.util.Date;
-import java.util.Properties;
 import java.util.Scanner;
 
 public class ManageList {
@@ -13,70 +9,9 @@ public class ManageList {
         Scanner sc = new Scanner(System.in);
 
         // 데이터베이스 기본 로드 데이터
-        try {
-            // MariaDB JDBC 드라이버 로드
-            Class.forName("org.mariadb.jdbc.Driver");
-            System.out.println("드라이버 로딩 성공");
-        } catch (ClassNotFoundException e) {
-            System.out.println("[에러] 드라이버 로딩 실패: " + e.getMessage());
-        }
-        Properties props = new Properties();
-        String filePath = "./src/com/pages/config.properties";
-        System.out.println("Working Directory= " + System.getProperty("user.dir"));
-
-        String url = null;
-        String user = null;
-        String password = null;
-        try {
-            InputStream input = new FileInputStream(filePath);
-            props.load(input);
-            // 데이터베이스 연결 정보
-            url = props.getProperty("db.url");
-            user = props.getProperty("db.user");
-            password = props.getProperty("db.password");
-        } catch (IOException e) {
-            System.out.println("[에러] 데이터베이스 연결 실패: " + e.getMessage());
-        }
-
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        PreparedStatement pstmt = null;
-
-        try {
-            // 데이터베이스에 연결
-            conn = DriverManager.getConnection(url, user, password);
-            System.out.println("데이터베이스 연결 성공");
-            // Statement 객체 생성
-
-            String sqlDrop = "DROP TABLE IF EXISTS users";
-            stmt.executeUpdate(sqlDrop);
-
-            stmt = conn.createStatement();
-            String sqlCreate = "CREATE TABLE IF NOT EXISTS users (" +
-                    "id INT(5) AUTO_INCREMENT PRIMARY KEY , " +
-                    "name VARCHAR(14) NOT NULL, " +
-                    "phone VARCHAR(13), " +
-                    "email VARCHAR(50), " +
-                    "`group` VARCHAR(13), " +
-                    "birth DATE, " +
-                    "`date` DATE" +
-                    ")";
-            stmt.executeUpdate(sqlCreate);
-
-            String sqlInsert = "INSERT INTO users (name, phone, email, `group`, birth, `date`) VALUES " +
-                    "('홍길동', '010-2222-3333', 'hong@test.com', '친구', '2018-01-01', CURDATE())," +
-                    "('박문수', '010-2222-3333', 'park@test.com', '친구', '2018-01-01', CURDATE())," +
-                    "('이몽룡', '010-2222-3333', 'lee@test.com', '가족', '2018-01-01', CURDATE()),";
-
-            stmt.executeUpdate(sqlInsert);
-        } catch (SQLException e) {
-            // 연결 실패 시 오류 메시지 출력
-            System.out.println("[에러] 데이터베이스 연결 실패: " + e.getMessage());
-        } finally {
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) {} }
-            if (conn != null) { try { conn.close(); } catch (SQLException e) {} }
-        }
+        Database db = new Database("./src/com/pages/config.properties");
+        db.connect();
+        db.prep();
 
         whileLoop:
         while(true) {
@@ -96,10 +31,10 @@ public class ManageList {
 
             switch (option) {
                 case "1":
-                    list(stmt, rs);
+                    list();
                     break;
                 case "2":
-                    create(sc);
+                    CreateList.create(sc);
                     break;
                 case "3":
                     update(sc);
@@ -112,6 +47,7 @@ public class ManageList {
                     break;
                 case "6":
                     System.out.println("프로그램을 종료합니다.");
+                    db.close();
                     break whileLoop;
                 default:
                     System.out.println("[에러]: 잘못된 값이 입력되었습니다");
@@ -120,64 +56,64 @@ public class ManageList {
         }
     }
 
-    public static void list(Statement stmt, ResultSet rs){
+    public static void list(){
         System.out.println("회원 관리 프로그램");
         System.out.println("=========================================");
         System.out.println("번호\t 이름\t 연락처\t\t 이쪽지\t\t 그룹\t 생년월일\t 등록일\t");
         System.out.println("=========================================");
 
         // TODO: DB에서 정보 불러오기
-        try {
-            String sql = "SELECT *, count(*) as count FROM users";
-            rs = stmt.executeQuery(sql);
-            String count = "";
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                String phone = rs.getString("phone");
-                String email = rs.getString("email");
-                String group = rs.getString("group");
-                Date birth = rs.getDate("birth");
-                Date date = rs.getDate("date");
-                count = rs.getString("count");
-
-
-                System.out.printf("%s\t %s\t %s\t\t %s\t\t %s\t %s\t %s\t%n", id, name, phone, email, group, birth, date);
-            }
-            System.out.printf("총 %s명=====================================", count);
-            System.out.println();
-        } catch (Exception e) {
-            System.out.println("[에러]: " + e.getMessage());
-        } finally {
-            if(stmt != null) { try { stmt.close(); } catch (SQLException e) {} }
-            if(rs != null) try { rs.close(); } catch (SQLException e) {}
-        }
+//        try {
+//            String sql = "SELECT *, count(*) as count FROM users";
+//            rs = stmt.executeQuery(sql);
+//            String count = "";
+//            while (rs.next()) {
+//                int id = rs.getInt("id");
+//                String name = rs.getString("name");
+//                String phone = rs.getString("phone");
+//                String email = rs.getString("email");
+//                String group = rs.getString("group");
+//                Date birth = rs.getDate("birth");
+//                Date date = rs.getDate("date");
+//                count = rs.getString("count");
+//
+//
+//                System.out.printf("%s\t %s\t %s\t\t %s\t\t %s\t %s\t %s\t%n", id, name, phone, email, group, birth, date);
+//            }
+//            System.out.printf("총 %s명=====================================", count);
+//            System.out.println();
+//        } catch (Exception e) {
+//            System.out.println("[에러]: " + e.getMessage());
+//        } finally {
+//            if(stmt != null) { try { stmt.close(); } catch (SQLException e) {} }
+//            if(rs != null) try { rs.close(); } catch (SQLException e) {}
+//        }
     }
 
-    public static void create(Scanner sc){
-        System.out.println("등록할 회원정보를 입력해주세요");
-        System.out.print("▶▶ 이름 : ");
-        String name = sc.nextLine();
-        System.out.print("▶▶ 연락처 : ");
-        String phone = sc.nextLine();
-        System.out.print("▶▶ 이쪽지 : ");
-        String email = sc.nextLine();
-        System.out.print("▶▶ 그룹 : ");
-        String group = sc.nextLine();
-        System.out.print("▶▶ 생년월일 : ");
-        String birth = sc.nextLine();
-        System.out.println();
-
-        System.out.print("회원정보를 등록하시겠습니까(y/n) ? ");
-        if(sc.next().equals("y")) {
-            System.out.println("회원정보를 정상적으로 등록하였습니다.");
-            // TODO: 회원정보 DB에 저장
-
-        } else {
-            System.out.println("회원정보등록에 실패했습니다.");
-        }
-
-    }
+//    public static void create(Scanner sc){
+//        System.out.println("등록할 회원정보를 입력해주세요");
+//        System.out.print("▶▶ 이름 : ");
+//        String name = sc.nextLine();
+//        System.out.print("▶▶ 연락처 : ");
+//        String phone = sc.nextLine();
+//        System.out.print("▶▶ 이쪽지 : ");
+//        String email = sc.nextLine();
+//        System.out.print("▶▶ 그룹 : ");
+//        String group = sc.nextLine();
+//        System.out.print("▶▶ 생년월일 : ");
+//        String birth = sc.nextLine();
+//        System.out.println();
+//
+//        System.out.print("회원정보를 등록하시겠습니까(y/n) ? ");
+//        if(sc.next().equals("y")) {
+//            System.out.println("회원정보를 정상적으로 등록하였습니다.");
+//            // TODO: 회원정보 DB에 저장
+//
+//        } else {
+//            System.out.println("회원정보등록에 실패했습니다.");
+//        }
+//
+//    }
 
     public static void update(Scanner sc){
         System.out.print("수정할 회원의 등록번호를 입력해주세요 ? ");
