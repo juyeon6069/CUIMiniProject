@@ -14,7 +14,7 @@ public class ManageList {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        // 데이터베이스 기본로드 모델
+        // 데이터베이스 기본 로드 데이터
         try {
             // MariaDB JDBC 드라이버 로드
             Class.forName("org.mariadb.jdbc.Driver");
@@ -46,8 +46,12 @@ public class ManageList {
             conn = DriverManager.getConnection(url, user, password);
             System.out.println("데이터베이스 연결 성공");
             // Statement 객체 생성
+
+            String sqlDrop = "DROP TABLE IF EXISTS users";
+            stmt.executeUpdate(sqlDrop);
+
             stmt = conn.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS users (" +
+            String sqlCreate = "CREATE TABLE IF NOT EXISTS users (" +
                     "id INT(5) AUTO_INCREMENT PRIMARY KEY , " +
                     "name VARCHAR(14) NOT NULL, " +
                     "phone VARCHAR(13), " +
@@ -56,7 +60,14 @@ public class ManageList {
                     "birth DATE, " +
                     "`date` DATE" +
                     ")";
-            int result = stmt.executeUpdate(sql);
+            stmt.executeUpdate(sqlCreate);
+
+            String sqlInsert = "INSERT INTO users (name, phone, email, `group`, birth, `date`) VALUES " +
+                    "('홍길동', '010-2222-3333', 'hong@test.com', '친구', '2018-01-01', CURDATE())," +
+                    "('박문수', '010-2222-3333', 'park@test.com', '친구', '2018-01-01', CURDATE())," +
+                    "('이몽룡', '010-2222-3333', 'lee@test.com', '가족', '2018-01-01', CURDATE()),";
+
+            stmt.executeUpdate(sqlInsert);
         } catch (SQLException e) {
             // 연결 실패 시 오류 메시지 출력
             System.out.println("[에러] 데이터베이스 연결 실패: " + e.getMessage());
