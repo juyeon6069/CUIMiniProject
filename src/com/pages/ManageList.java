@@ -1,11 +1,74 @@
 package com.pages;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class ManageList {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
+        // 데이터베이스 기본로드 모델
+        try {
+            // MariaDB JDBC 드라이버 로드
+            Class.forName("org.mariadb.jdbc.Driver");
+            System.out.println("드라이버 로딩 성공");
+        } catch (ClassNotFoundException e) {
+            System.out.println("[에러] 드라이버 로딩 실패: " + e.getMessage());
+        }
+        Properties props = new Properties();
+        String filePath = "config.properties";
+
+        String url = null;
+        String user = null;
+        String password = null;
+        try {
+            InputStream input = new FileInputStream(filePath);
+            props.load(input);
+            // 데이터베이스 연결 정보
+            url = props.getProperty("db.url");
+            user = props.getProperty("db.user");
+            password = props.getProperty("db.password");
+        } catch (IOException e) {
+            System.out.println("[에러] 데이터베이스 연결 실패: " + e.getMessage());
+        }
+
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            // 데이터베이스에 연결
+            conn = DriverManager.getConnection(url, user, password);
+            System.out.println("데이터베이스 연결 성공");
+            // Statement 객체 생성
+            stmt = conn.createStatement();
+            String sql = "CREATE TABLE IF NOT EXISTS users (" +
+                    "id INT(5) AUTO_INCREMENT PRIMARY KEY , " +
+                    "name VARCHAR(14) NOT NULL, " +
+                    "phone VARCHAR(13), " +
+                    "email VARCHAR(50), " +
+                    "`group` VARCHAR(13), " +
+                    "birth DATE, " +
+                    "`date` DATE" +
+                    ")";
+            int result = stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            // 연결 실패 시 오류 메시지 출력
+            System.out.println("[에러] 데이터베이스 연결 실패: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {conn.close();
+                    System.out.println("데이터베이스 연결 해제");
+                } catch (SQLException e) {
+                    System.out.println("[에러] 연결 해제 실패: " + e.getMessage());
+                }
+            }
+        }
         whileLoop:
         while(true) {
             // 기본 페이지
