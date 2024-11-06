@@ -86,52 +86,59 @@ public class Util {
         String email = "";
         String group = "";
         String birth = "";
-
         String sql = String.format("SELECT * FROM users WHERE id = %d", id);
         rs = db.pExecuteQuery(sql);
+
         try {
-            name = rs.getString("name");
-            phone = rs.getString("phone");
-            email = rs.getString("email");
-            group = rs.getString("group");
-            birth = rs.getString("birth");
-            Date date = rs.getDate("date");
+            if(id == rs.getInt("id")){
+
+                name = rs.getString("name");
+                phone = rs.getString("phone");
+                email = rs.getString("email");
+                group = rs.getString("group");
+                birth = rs.getString("birth");
+                Date date = rs.getDate("date");
 
 
-            System.out.printf("[%s]님의 회원정보\n", id);
-            System.out.printf("이름: %s\n", name);
-            System.out.printf("연락처 : %s\n", phone);
-            System.out.printf("이쪽지 : %s\n", email);
-            System.out.printf("그룹 : %s\n", group);
-            System.out.printf("생년월일 : %s\n", birth);
-            System.out.println();
+                System.out.printf("[%s]님의 회원정보\n", id);
+                System.out.printf("이름: %s\n", name);
+                System.out.printf("연락처 : %s\n", phone);
+                System.out.printf("이쪽지 : %s\n", email);
+                System.out.printf("그룹 : %s\n", group);
+                System.out.printf("생년월일 : %s\n", birth);
+                System.out.println();
 
 
-            System.out.print("회원정보수정을 계속하시겠습니까(y/n) ? ");
-            if (sc.next().equals("y")) {
-                System.out.println("** 입력하지 않으면 기존의 정보가 그대로 유지됩니다.");
-                System.out.printf("▶▶ 수정할 이름 : ");
-                name = sc.nextLine();
-                System.out.printf("▶▶ 수정할 연락처 : ");
-                phone = sc.nextLine();
-                System.out.printf("▶▶ 수정할 이쪽지 : ");
-                email = sc.nextLine();
-                System.out.printf("▶▶ 수정할 그룹 : ");
-                group = sc.nextLine();
-                System.out.printf("▶▶ 수정할 생년월일 : ");
-                birth = sc.nextLine();
+                System.out.print("회원정보수정을 계속하시겠습니까(y/n) ? ");
+                if (sc.next().equals("y")) {
+                    System.out.println("** 입력하지 않으면 기존의 정보가 그대로 유지됩니다.");
+                    System.out.printf("▶▶ 수정할 이름 : ");
+                    name = sc.nextLine();
+                    System.out.printf("▶▶ 수정할 연락처 : ");
+                    phone = sc.nextLine();
+                    System.out.printf("▶▶ 수정할 이쪽지 : ");
+                    email = sc.nextLine();
+                    System.out.printf("▶▶ 수정할 그룹 : ");
+                    group = sc.nextLine();
+                    System.out.printf("▶▶ 수정할 생년월일 : ");
+                    birth = sc.nextLine();
 
-                String sqlUpdate = String.format("UPDATE users SET name = '%s', phone = '%s', email = '%s', group = '%s', birth = '%s' WHERE id = %d",
-                        name, phone, email, group, birth, id);
-                db.executeUpdate(sqlUpdate);
+                    String sqlUpdate = String.format("UPDATE users SET name = '%s', phone = '%s', email = '%s', group = '%s', birth = '%s' WHERE id = %d",
+                            name, phone, email, group, birth, id);
+                    db.executeUpdate(sqlUpdate);
 
-                System.out.println("회원정보를 정상적으로 수정하였습니다.");
-            } else {
-                System.out.println("회원정보수정에 실패했습니다.");
+                    System.out.println("회원정보를 정상적으로 수정하였습니다.");
+                } else {
+                    System.out.println("회원정보수정에 실패했습니다.");
+                }
+
+            } else  {
+                System.out.println("입력하신 회원등록번호에 해당하는 회원은 존재하지 않습니다.");
             }
-
         } catch (SQLException e) {
-            System.out.println("입력하신 회원등록번호에 해당하는 회원은 존재하지 않습니다.");
+            System.out.println("[에러]"+e.getMessage());
+        }finally {
+            if(rs != null) { try { rs.close(); } catch (SQLException e) {} }
         }
 
     }
@@ -140,7 +147,8 @@ public class Util {
         ResultSet rs = null;
 
         System.out.print("삭제할 회원의 등록번호를 입력해주세요 ?");
-        String id = sc.nextLine();
+        String sid = sc.nextLine();
+        int id = Integer.parseInt(sid);
 
         String name = "";
         String phone = "";
@@ -150,54 +158,73 @@ public class Util {
 
         String sql = String.format("SELECT * FROM users WHERE id = %d", id);
         rs = db.pExecuteQuery(sql);
+
         try {
-            name = rs.getString("name");
-            phone = rs.getString("phone");
-            email = rs.getString("email");
-            group = rs.getString("group");
-            birth = rs.getString("birth");
-            Date date = rs.getDate("date");
+            if(id == rs.getInt("id")){
 
-            System.out.printf("[%s]님의 회원정보\n", id);
-            System.out.printf("이름: %s\n", name);
-            System.out.printf("연락처 : %s\n", phone);
-            System.out.printf("이쪽지 : %s\n", email);
-            System.out.printf("그룹 : %s\n", group);
-            System.out.printf("생년월일 : %s\n", birth);
-            System.out.println();
+                name = rs.getString("name");
+                phone = rs.getString("phone");
+                email = rs.getString("email");
+                group = rs.getString("group");
+                birth = rs.getString("birth");
+                Date date = rs.getDate("date");
 
-            System.out.print("회원정보삭제를 계속하시겠습니까(y/n) ? ");
-            if (sc.next().equals("y")) {
-                System.out.println("회원정보를 정상적으로 삭제하였습니다.");
-                String sqlDelete = String.format("DELETE FROM users WHERE id = %d", id);
-                db.executeUpdate(sqlDelete);
+                System.out.printf("[%s]님의 회원정보\n", id);
+                System.out.printf("이름: %s\n", name);
+                System.out.printf("연락처 : %s\n", phone);
+                System.out.printf("이쪽지 : %s\n", email);
+                System.out.printf("그룹 : %s\n", group);
+                System.out.printf("생년월일 : %s\n", birth);
+                System.out.println();
+
+                System.out.print("회원정보삭제를 계속하시겠습니까(y/n) ? ");
+                if (sc.next().equals("y")) {
+                    System.out.println("회원정보를 정상적으로 삭제하였습니다.");
+                    String sqlDelete = String.format("DELETE FROM users WHERE id = %d", id);
+                    db.executeUpdate(sqlDelete);
+                } else {
+                    System.out.println("회원정보삭제에 실패했습니다.");
+                }
             } else {
-                System.out.println("회원정보삭제에 실패했습니다.");
+                System.out.println("입력하신 회원등록번호에 해당하는 회원은 존재하지 않습니다.");
             }
         } catch (SQLException e) {
-            System.out.println("입력하신 회원등록번호에 해당하는 회원은 존재하지 않습니다.");
-        } finally{
-
+            System.out.println("[에러]"+e.getMessage());
+        } finally {
+            if(rs != null){try { rs.close(); } catch (SQLException e) {} }
         }
     }
 
     public void sendMessage(Scanner sc){
+        ResultSet rs = null;
         System.out.print("쪽지를 보낼 회원의 등록번호를 입력해주세요 ? ");
-        String id = sc.nextLine();
+        String sid = sc.nextLine();
+        int id = Integer.parseInt(sid);
 
-        // TODO: DB에서 검색
-        //      exist =>
-        //      not exist => System.out.println("입력하신 회원등록번호에 해당하는 회원은 존재하지 않습니다.");
-        System.out.print("▶▶ 쪽지 제목 : ");
-        String msgTitle = sc.nextLine();
-        System.out.print("▶▶ 쪽지 내용 : ");
-        String msgBody = sc.nextLine();
+        String sql = String.format("SELECT * FROM users WHERE id = %d", id);
+        rs = db.pExecuteQuery(sql);
 
-        System.out.print("쪽지 보내시겠습니니까(y/n) ? ");
-        if(sc.next().equals("y")) {
-            System.out.println("쪽지가 정상적으로 발송되었습니다.");
-        }else{
-            System.out.println("쪽지 발송에 실패했습니다.");
+        try {
+            if(id == rs.getInt("id")){
+
+                System.out.print("▶▶ 쪽지 제목 : ");
+                String msgTitle = sc.nextLine();
+                System.out.print("▶▶ 쪽지 내용 : ");
+                String msgBody = sc.nextLine();
+
+                System.out.print("쪽지 보내시겠습니니까(y/n) ? ");
+                if (sc.next().equals("y")) {
+                    System.out.println("쪽지가 정상적으로 발송되었습니다.");
+                } else {
+                    System.out.println("쪽지 발송에 실패했습니다.");
+                }
+            } else {
+                System.out.println("입력하신 회원등록번호에 해당하는 회원은 존재하지 않습니다.");
+            }
+        } catch (SQLException e) {
+            System.out.println("[에러]"+e.getMessage());
+        } finally {
+            if(rs != null){try { rs.close(); } catch (SQLException e) {} }
         }
     }
 }
