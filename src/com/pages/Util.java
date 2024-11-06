@@ -77,8 +77,9 @@ public class Util {
 
     public void update(Scanner sc){
         ResultSet rs = null;
+
         System.out.print("수정할 회원의 등록번호를 입력해주세요 ? ");
-        String sid = sc.nextLine();
+        String sid = sc.next();
         int id = Integer.parseInt(sid);
 
         String name = "";
@@ -147,7 +148,7 @@ public class Util {
         ResultSet rs = null;
 
         System.out.print("삭제할 회원의 등록번호를 입력해주세요 ?");
-        String sid = sc.nextLine();
+        String sid = sc.next();
         int id = Integer.parseInt(sid);
 
         String name = "";
@@ -198,7 +199,7 @@ public class Util {
     public void sendMessage(Scanner sc){
         ResultSet rs = null;
         System.out.print("쪽지를 보낼 회원의 등록번호를 입력해주세요 ? ");
-        String sid = sc.nextLine();
+        String sid = sc.next();
         int id = Integer.parseInt(sid);
 
         String sql = String.format("SELECT * FROM users WHERE id = %d", id);
