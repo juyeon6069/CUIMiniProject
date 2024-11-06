@@ -40,9 +40,6 @@ public class Database {
 
         Connection conn = null;
 
-        ResultSet rs = null;
-        PreparedStatement pstmt = null;
-
         try {
             // 데이터베이스에 연결
             conn = DriverManager.getConnection(url, user, password);
@@ -86,12 +83,64 @@ public class Database {
 
             stmt.executeUpdate(sqlInsert);
         } catch (SQLException e) {
-            System.out.println("[에러]: " + e.getMessage());
+            System.out.println("[에러]: 데이터 기본 로드 시 에러가 발생하였습니다\n" + e.getMessage());
         } finally {
             if(stmt != null) { try { stmt.close(); } catch (SQLException e) {} }
-
         }
     }
+
+    public ResultSet executeQuery(String query){
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            return stmt.executeQuery(query);
+        } catch (SQLException e) {
+            System.out.println("[에러]: executeQuery 실행 시 에러가 발생하였습니다\n" + e.getMessage());
+            return null;
+        } finally {
+            if(stmt != null){ try { stmt.close(); } catch (SQLException e) {} }
+        }
+    }
+
+    public int executeUpdate(String query){
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            return stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            System.out.println("[에러]: executeUpdate 실행 시 에러가 발생하였습니다\n" + e.getMessage());
+            return -1;
+        } finally {
+            if(stmt != null){ try { stmt.close(); } catch (SQLException e) {} }
+        }
+    }
+
+    public ResultSet pExecuteQuery(String query){
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = connection.prepareStatement(query);
+            return pstmt.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("[에러]: pExecuteQuery 실행 시 에러가 발생하였습니다\n" + e.getMessage());
+            return null;
+        } finally {
+            if(pstmt != null){ try { pstmt.close(); } catch (SQLException e) {} }
+        }
+    }
+
+    public int pExecuteUpdate(String query){
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = connection.prepareStatement(query);
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("[에러]: pExecuteUpdate 실행 시 에러가 발생하였습니다\n" + e.getMessage());
+            return -1;
+        } finally {
+            if(pstmt != null){ try { pstmt.close(); } catch (SQLException e) {} }
+        }
+    }
+
 
     public void close(){
         if (connection != null) { try { connection.close(); } catch (SQLException e) {} }
